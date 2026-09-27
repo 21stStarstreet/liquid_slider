@@ -1,0 +1,405 @@
+/**
+ * Pulsar Glass — Liquid Glass Segmented Slider
+ * Version: 1.0.0
+ *
+ * Self-contained CSS. No external dependencies.
+ * Prefix: .pg-  (PulsarGlass)
+ *
+ * Usage:
+ *   <link rel="stylesheet" href="pulsar-glass.css">
+ *
+ * Theme: Add data-pg-theme="light" to any ancestor element to switch to light mode.
+ * Or use the JS API: PulsarGlass.setTheme('light' | 'dark')
+ *
+ * MIT License
+ */
+
+/* ─── CSS Custom Properties ──────────────────────────────────────────────────── */
+
+:root,
+[data-pg-theme="dark"],
+[data-theme="dark"] {
+  /* Track (the groove / bezel) */
+  --pg-track-bg:             rgba(15, 23, 42, 0.55);
+  --pg-track-border:         rgba(255, 255, 255, 0.07);
+  --pg-track-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.45),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.04),
+    0 4px 14px rgba(0, 0, 0, 0.2);
+  --pg-track-radius:         13px;
+  --pg-track-padding:        3px;
+  --pg-track-blur:           blur(16px) saturate(180%);
+
+  /* Slider lens body */
+  --pg-lens-bg:
+    linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 50%, rgba(255,255,255,0.03) 100%),
+    rgba(13, 148, 136, 0.06);
+  --pg-lens-blur:            blur(16px) saturate(200%) contrast(108%) brightness(105%);
+  --pg-lens-border:          rgba(255, 255, 255, 0.10);
+  --pg-lens-radius:          11px;
+  --pg-lens-shadow:
+    inset 0 0.5px 1px 0   rgba(255, 255, 255, 0.45),
+    inset 1px 0 1.5px -0.5px rgba(56, 189, 248, 0.35),
+    inset -1px 0 1.5px -0.5px rgba(45, 212, 191, 0.30),
+    inset 0 -1px 1px 0   rgba(0, 0, 0, 0.25),
+    inset 0 0 10px 0     rgba(255, 255, 255, 0.04),
+    0 6px 18px rgba(0, 0, 0, 0.30),
+    0 0 0 0 rgba(56, 189, 248, 0);
+  --pg-lens-shadow-pressed:
+    inset 0 0.5px 1px 0   rgba(255, 255, 255, 0.55),
+    inset 1.2px 0 2px -0.5px rgba(56, 189, 248, 0.40),
+    inset -1.2px 0 2px -0.5px rgba(45, 212, 191, 0.35),
+    inset 0 -1px 1.5px 0  rgba(0, 0, 0, 0.30),
+    inset 0 0 10px 0     rgba(255, 255, 255, 0.06),
+    0 4px 12px rgba(0, 0, 0, 0.32);
+  --pg-lens-shadow-dragging:
+    inset 0 0.5px 1.5px 0 rgba(255, 255, 255, 0.65),
+    inset 2px 0 2.5px -0.5px rgba(56, 189, 248, 0.45),
+    inset -2px 0 2.5px -0.5px rgba(45, 212, 191, 0.40),
+    inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.35),
+    inset 0 0 12px 0     rgba(255, 255, 255, 0.08),
+    0 12px 28px rgba(0, 0, 0, 0.45);
+  --pg-lens-shadow-overshoot:
+    inset 0 0.5px 1.5px 0 rgba(255, 255, 255, 0.65),
+    inset 2px 0 2.5px -0.5px rgba(56, 189, 248, 0.45),
+    inset -2px 0 2.5px -0.5px rgba(45, 212, 191, 0.40),
+    inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.35),
+    inset 0 0 12px 0     rgba(255, 255, 255, 0.08),
+    0 16px 36px rgba(0, 0, 0, 0.55);
+
+  /* Button labels */
+  --pg-btn-color:            #94a3b8;
+  --pg-btn-hover-color:      #f1f5f9;
+  --pg-btn-active-color:     #ffffff;
+  --pg-btn-font-size:        12.5px;
+  --pg-btn-font-weight:      600;
+  --pg-btn-padding:          6px 16px;
+  --pg-btn-min-width:        66px;
+  --pg-btn-radius:           10px;
+
+  /* Specular highlight (top of lens) */
+  --pg-crest-color-left:     rgba(56, 189, 248, 0.25);
+  --pg-crest-color-center:   rgba(255, 255, 255, 0.70);
+  --pg-crest-color-right:    rgba(45, 212, 191, 0.25);
+  --pg-specular-color:       rgba(255, 255, 255, 0.20);
+}
+
+/* ─── Light Theme Overrides ─────────────────────────────────────────────────── */
+
+[data-pg-theme="light"],
+[data-theme="light"] {
+  --pg-track-bg:           rgba(226, 232, 240, 0.65);
+  --pg-track-border:       rgba(0, 0, 0, 0.08);
+  --pg-track-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.06),
+    0 2px 8px rgba(0, 0, 0, 0.04);
+
+  /* Slider Lens Body: Ultra-Clean Frosted White Crystal */
+  --pg-lens-bg:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.75) 100%),
+    rgba(255, 255, 255, 0.40);
+  --pg-lens-blur:            blur(16px) saturate(180%) contrast(105%);
+  --pg-lens-border:          rgba(255, 255, 255, 0.95);
+
+  /* Durgun Hal: Saf kristal cam kırılması, incecik mikro-refraksiyon */
+  --pg-lens-shadow:
+    inset 0 1px 1px 0 rgba(255, 255, 255, 1),
+    inset 0.5px 0 1px -0.5px rgba(56, 189, 248, 0.12),
+    inset -0.5px 0 1px -0.5px rgba(45, 212, 191, 0.10),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.03),
+    inset 0 0 10px 0 rgba(255, 255, 255, 0.50),
+    0 3px 10px rgba(15, 23, 42, 0.06),
+    0 1px 3px rgba(15, 23, 42, 0.03);
+
+  /* Basılma Hali (Pressed): Asil, berrak dokunsal derinlik + çok zarif prizma pırıltısı */
+  --pg-lens-shadow-pressed:
+    inset 0 1px 1.2px 0 rgba(255, 255, 255, 1),
+    inset 1px 0 1.2px -0.5px rgba(56, 189, 248, 0.25),
+    inset -1px 0 1.2px -0.5px rgba(251, 146, 60, 0.18),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.04),
+    inset 0 0 12px 0 rgba(255, 255, 255, 0.60),
+    0 4px 12px rgba(15, 23, 42, 0.08),
+    0 1px 3px rgba(15, 23, 42, 0.04);
+
+  /* Sürükleme Hali (Hareket Modu / Dragging): Havalanan berrak cam, incecik safir/amber prizma kırılması */
+  --pg-lens-shadow-dragging:
+    inset 0 1.2px 1.5px 0 rgba(255, 255, 255, 1),
+    inset 1.2px 0 1.5px -0.5px rgba(56, 189, 248, 0.30),
+    inset -1.2px 0 1.5px -0.5px rgba(251, 146, 60, 0.22),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.05),
+    inset 0 0 14px 0 rgba(255, 255, 255, 0.70),
+    0 10px 24px rgba(15, 23, 42, 0.10),
+    0 2px 6px rgba(15, 23, 42, 0.05);
+
+  /* Sınır Aşımı (Overshoot): Sıfır parlama / sıfır dış aura! Sadece doğal derinlik ve elastik gerilim */
+  --pg-lens-shadow-overshoot:
+    inset 0 1.2px 1.5px 0 rgba(255, 255, 255, 1),
+    inset 1.2px 0 1.5px -0.5px rgba(56, 189, 248, 0.30),
+    inset -1.2px 0 1.5px -0.5px rgba(251, 146, 60, 0.22),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.05),
+    inset 0 0 14px 0 rgba(255, 255, 255, 0.70),
+    0 10px 24px rgba(15, 23, 42, 0.10),
+    0 2px 6px rgba(15, 23, 42, 0.05);
+
+  --pg-btn-color:            #64748b;
+  --pg-btn-hover-color:      #0f172a;
+  --pg-btn-active-color:     #0f172a;
+
+  /* Tepe Speküler Pırıltı ve Çizgisi: Üst pah üzerinde incecik kristal gökkuşağı kırılması */
+  --pg-crest-color-left:     rgba(56, 189, 248, 0.35);
+  --pg-crest-color-center:   rgba(255, 255, 255, 0.95);
+  --pg-crest-color-right:    rgba(251, 146, 60, 0.25);
+  --pg-specular-color:       rgba(255, 255, 255, 0.40);
+}
+
+/* Light Mode: Hareket modunda aşırı kalın renk yaratan SVG filtresini devreden çıkar */
+[data-pg-theme="light"] .pg-slider.pg-has-refract,
+[data-pg-theme="light"] .pg-slider.pg-pressed,
+[data-pg-theme="light"] .pg-track.pg-dragging .pg-slider,
+[data-theme="light"] .pg-slider.pg-has-refract,
+[data-theme="light"] .pg-slider.pg-pressed,
+[data-theme="light"] .pg-track.pg-dragging .pg-slider {
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+
+/* Light Mode: Sürükleme ve basılma anında pürüzsüz beyaz kenarlık */
+[data-pg-theme="light"] .pg-slider.pg-pressed,
+[data-theme="light"] .pg-slider.pg-pressed,
+[data-pg-theme="light"] .pg-track.pg-dragging .pg-slider,
+[data-theme="light"] .pg-track.pg-dragging .pg-slider {
+  border-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* ─── Track (Glass Tray / Bezel) ─────────────────────────────────────────────── */
+
+.pg-track {
+  position:  relative;
+  display:   inline-flex;
+  align-items: center;
+  background: var(--pg-track-bg);
+  backdrop-filter: var(--pg-track-blur);
+  -webkit-backdrop-filter: var(--pg-track-blur);
+  padding:   var(--pg-track-padding);
+  border-radius: var(--pg-track-radius);
+  border:    0.5px solid var(--pg-track-border);
+  box-shadow: var(--pg-track-shadow);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  cursor:    pointer;
+  contain:   layout;
+  overflow:  visible;
+  isolation: isolate;
+}
+
+.pg-track.pg-dragging {
+  cursor: grabbing;
+}
+
+/* ─── Slider Lens — 6-Layer Optical Glass Body ───────────────────────────────── */
+
+.pg-slider {
+  position:  absolute;
+  top:       var(--pg-track-padding);
+  bottom:    var(--pg-track-padding);
+  left:      0;
+  width:     0;
+  border-radius: var(--pg-lens-radius);
+  background: var(--pg-lens-bg);
+  backdrop-filter: var(--pg-lens-blur);
+  -webkit-backdrop-filter: var(--pg-lens-blur);
+  filter: none;
+  -webkit-filter: none;
+  border:    0.5px solid var(--pg-lens-border);
+  box-shadow: var(--pg-lens-shadow);
+  pointer-events: none;
+  z-index:   1;
+  opacity:   1;
+  transform-origin: center center;
+  transition:
+    transform 0.48s cubic-bezier(0.19, 1.35, 0.32, 1),
+    width     0.48s cubic-bezier(0.19, 1.35, 0.32, 1),
+    opacity   0.20s ease,
+    box-shadow 0.48s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.48s ease;
+  will-change: transform, width;
+  contain: layout;
+}
+
+/* Layer 5: Fixed Specular Highlight (top of lens, cursor-independent) */
+.pg-slider::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    ellipse 80% 65% at 50% 15%,
+    var(--pg-specular-color) 0%,
+    rgba(255, 255, 255, 0.04) 45%,
+    transparent 80%
+  );
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+/* Layer 6: Ultra-Fine Crest Flare (horizontal hairline at top edge) */
+.pg-slider::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 8%;
+  right: 8%;
+  height: 0.5px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--pg-crest-color-left) 15%,
+    var(--pg-crest-color-center) 50%,
+    var(--pg-crest-color-right) 85%,
+    transparent 100%
+  );
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* State: Pressed / Dragging */
+.pg-slider.pg-pressed {
+  box-shadow: var(--pg-lens-shadow-pressed);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+/* SVG filter active during drag / flight (chromatic aberration) */
+.pg-slider.pg-has-refract,
+.pg-slider.pg-pressed,
+.pg-track.pg-dragging .pg-slider {
+  filter: url(#pulsar-glass-refract);
+  -webkit-filter: url(#pulsar-glass-refract);
+}
+
+/* State: Dragging */
+.pg-track.pg-dragging .pg-slider {
+  box-shadow: var(--pg-lens-shadow-dragging);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+/* State: Elastic overshoot (rubber-banding beyond bounds) */
+.pg-slider.pg-overshooting {
+  box-shadow: var(--pg-lens-shadow-overshoot);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+/* State: Spring-back releasing */
+.pg-slider.pg-releasing {
+  will-change: transform, width, box-shadow;
+}
+
+/* ─── Buttons ─────────────────────────────────────────────────────────────────── */
+
+.pg-btn {
+  position:  relative;
+  z-index:   2;
+  padding:   var(--pg-btn-padding);
+  min-width: var(--pg-btn-min-width);
+  text-align: center;
+  border-radius: var(--pg-btn-radius);
+  border:    none;
+  background: transparent;
+  color:     var(--pg-btn-color);
+  font-size: var(--pg-btn-font-size);
+  font-weight: var(--pg-btn-font-weight);
+  cursor:    pointer;
+  transition:
+    color      0.36s cubic-bezier(0.16, 1, 0.3, 1),
+    text-shadow 0.36s ease;
+  white-space: nowrap;
+  outline: none;
+  user-select: none;
+  -webkit-user-select: none;
+  /* Restore pointer events (track has touch-action: none) */
+  touch-action: none;
+}
+
+.pg-btn:focus-visible {
+  outline: 2px solid rgba(56, 189, 248, 0.6);
+  outline-offset: 2px;
+}
+
+.pg-btn:hover {
+  color: var(--pg-btn-hover-color);
+}
+
+/* Active and illuminated (lens passing over) */
+.pg-btn.active,
+.pg-btn.pg-illuminated {
+  color:       var(--pg-btn-active-color) !important;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  background:  transparent !important;
+  border-color: transparent !important;
+  box-shadow:  none !important;
+}
+
+/* ─── Button Label (inner span, carries water refraction) ───────────────────── */
+
+.pg-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  position: relative;
+  pointer-events: none;
+  transform-origin: center center;
+  transition:
+    color      0.36s cubic-bezier(0.16, 1, 0.3, 1),
+    transform  0.36s cubic-bezier(0.16, 1, 0.3, 1),
+    filter     0.30s ease;
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Lens sliding over label: underwater water refraction distortion */
+.pg-label.pg-refracting {
+  filter: url(#pulsar-glass-water);
+  -webkit-filter: url(#pulsar-glass-water);
+  transform: scale(1.04) translateY(-0.5px);
+}
+
+/* ─── Size Variants ──────────────────────────────────────────────────────────── */
+
+/* Small (.pg-sm): Concentric 2.5px margin, 10px outer / 7.5px inner */
+.pg-track.pg-sm {
+  --pg-track-padding:  2.5px;
+  --pg-track-radius:   10px;
+  --pg-lens-radius:    7.5px;
+  --pg-btn-padding:    4px 14px;
+  --pg-btn-min-width:  60px;
+  --pg-btn-font-size:  11.5px;
+  --pg-btn-radius:     7.5px;
+}
+
+/* Large (.pg-lg): Concentric 4.5px margin, 16px outer / 11.5px inner */
+.pg-track.pg-lg {
+  --pg-track-padding:  4.5px;
+  --pg-track-radius:   16px;
+  --pg-lens-radius:    11.5px;
+  --pg-btn-padding:    9px 24px;
+  --pg-btn-min-width:  96px;
+  --pg-btn-font-size:  14px;
+  --pg-btn-radius:     11.5px;
+}
+
+/* ─── Accessibility: Reduced Motion ─────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .pg-slider {
+    transition: none !important;
+    transform: none !important;
+  }
+  .pg-label {
+    transition: none !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
