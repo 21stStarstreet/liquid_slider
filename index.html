@@ -200,7 +200,6 @@
   -webkit-user-select: none;
   touch-action: none;
   cursor:    pointer;
-  contain:   layout;
   overflow:  visible;
   isolation: isolate;
 }
@@ -236,7 +235,6 @@
     box-shadow 0.48s cubic-bezier(0.16, 1, 0.3, 1),
     border-color 0.48s ease;
   will-change: transform, width;
-  contain: layout;
 }
 
 /* Layer 5: Fixed Specular Highlight (top of lens, cursor-independent) */
@@ -555,17 +553,13 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      margin: 24px auto 0;
+      margin: 20px auto 0;
       max-width: 100%;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      padding: 4px 6px;
-      touch-action: pan-y;
-    }
-    .header-toc-wrap::-webkit-scrollbar {
-      display: none;
+      overflow: visible;
+      padding: 6px 0 16px;
     }
     #trackToc {
+      margin: 0 auto;
       background: var(--pg-track-bg);
       border: 1px solid var(--pg-track-border);
       box-shadow: 0 8px 30px rgba(0, 0, 0, 0.24), var(--pg-track-shadow);
@@ -574,18 +568,19 @@
       transition: box-shadow 0.25s ease, border-color 0.25s ease;
       flex-shrink: 0;
       touch-action: none;
+      overflow: visible;
     }
     [data-pg-theme="light"] #trackToc {
       box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08), var(--pg-track-shadow);
     }
     #trackToc .pg-btn {
-      padding: 7px 15px;
-      font-size: 12.5px;
+      padding: 7px 13px;
+      font-size: 12px;
       font-weight: 600;
       letter-spacing: 0.02em;
       display: inline-flex;
       align-items: center;
-      gap: 7px;
+      gap: 6px;
       white-space: nowrap;
       touch-action: none;
     }
@@ -619,11 +614,24 @@
       }
       .header-toc-wrap {
         justify-content: flex-start;
-        padding: 4px 12px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 12px 64px 32px;
+        margin: 10px auto -16px;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+      .header-toc-wrap::-webkit-scrollbar {
+        display: none;
+        width: 0;
+        height: 0;
+      }
+      #trackToc {
+        margin: 0;
       }
       #trackToc .pg-btn {
-        padding: 6px 11px;
-        font-size: 11.5px;
+        padding: 6px 10px;
+        font-size: 11px;
         gap: 5px;
       }
       .wrapper {
@@ -3006,6 +3014,25 @@
   let scrollEndTimer = null;
   let scrollFallbackTimer = null;
 
+  function ensureTocButtonVisible(secId) {
+    const wrap = document.querySelector(".header-toc-wrap");
+    if (!wrap || wrap.scrollWidth <= wrap.clientWidth) return;
+    const btn = document.querySelector(`#trackToc .pg-btn[data-value="${secId}"]`);
+    if (!btn) return;
+    const track = document.getElementById("trackToc");
+    const trackOffset = track ? track.offsetLeft : 0;
+    const btnLeft = btn.offsetLeft + trackOffset;
+    const btnRight = btnLeft + btn.offsetWidth;
+    const wrapScrollLeft = wrap.scrollLeft;
+    const wrapWidth = wrap.clientWidth;
+
+    if (btnLeft < wrapScrollLeft + 20) {
+      wrap.scrollTo({ left: Math.max(0, btnLeft - 20), behavior: "smooth" });
+    } else if (btnRight > wrapScrollLeft + wrapWidth - 20) {
+      wrap.scrollTo({ left: btnRight - wrapWidth + 20, behavior: "smooth" });
+    }
+  }
+
   function navigateToSection(secId) {
     isProgrammaticScroll = true;
     if (scrollEndTimer) clearInterval(scrollEndTimer);
@@ -3018,6 +3045,7 @@
       if (activeVal !== secId) {
         slToc.selectByValue(secId, true);
       }
+      ensureTocButtonVisible(secId);
     }
 
     if (secId === "first-look") {
@@ -3077,6 +3105,7 @@
           if (currentActiveSection !== "first-look" && slToc) {
             currentActiveSection = "first-look";
             slToc.selectByValue("first-look", true);
+            ensureTocButtonVisible("first-look");
           }
           return;
         }
@@ -3102,6 +3131,7 @@
         if (activeId !== currentActiveSection && slToc) {
           currentActiveSection = activeId;
           slToc.selectByValue(activeId, true);
+          ensureTocButtonVisible(activeId);
         }
       });
     }, { passive: true });
